@@ -66,7 +66,7 @@ jobs:
       - name: Check if release is allowed or not
         id: validate_release
         run: |
-          if [[ "${ inputs.release_type }}" != "prerelease" && "${{ steps.validate_tag.outputs.IS_TAG_ON_MAIN }}" == "true" ]]; then
+          if [[ "${{ inputs.release_type }}" != "prerelease" && "${{ steps.validate_tag.outputs.IS_TAG_ON_MAIN }}" == "true" ]]; then
             echo "ERROR: Creating stable release from a tag on main is not allowed."
             exit 1
           fi
