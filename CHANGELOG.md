@@ -15,6 +15,7 @@ NEW FEATURES:
 * Add support for a `removed` block that allows users to remove resources or modules from the state without destroying them. ([#1158](https://github.com/opentofu/opentofu/pull/1158))
 
 ENHANCEMENTS:
+* Added support to use `.tfvars` files from tests folder. ([#1386](https://github.com/opentofu/opentofu/pull/1386))
 * Added `templatestring` function that takes a string and renders it as a template using a supplied set of template variables. ([#1223](https://github.com/opentofu/opentofu/pull/1223))
 * Added `base64gunzip` function that takes a base64 encoded gzip string and returns the decompressed data as a string. ([#800](https://github.com/opentofu/opentofu/issues/800))
 * Added `cidrcontains` function that determines if an address belongs to a certain prefix. ([#366](https://github.com/opentofu/opentofu/issues/366))
@@ -33,6 +34,7 @@ ENHANCEMENTS:
 * Allow for templatefile function recursion (up to 1024 call depth default). ([#1250](https://github.com/opentofu/opentofu/pull/1250))
 * Dump state file when `tofu test` fails to clean up resources. ([#1243](https://github.com/opentofu/opentofu/pull/1243))
 * Added aliases for `state list` (`state ls`), `state mv` (`state move`), and `state rm` (`state remove`) ([#1220](https://github.com/opentofu/opentofu/pull/1220))
+* Added mechanism to introduce automatic retries for provider installations, specifically targeting transient errors ([#1233](https://github.com/opentofu/opentofu/issues/1233))
 
 BUG FIXES:
 * Fix view hooks unit test flakiness by deterministically waiting for heartbeats to execute ([$1153](https://github.com/opentofu/opentofu/issues/1153))
