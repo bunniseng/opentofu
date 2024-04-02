@@ -212,11 +212,9 @@ snapcrafts:
         {{- if eq .Env.RELEASE_TYPE "prerelease" }}
           "{{ .Major }}.{{ .Minor }}/edge"
         {{- end }}
-      - >-
         {{- if eq .Env.RELEASE_TYPE "backport" }}
           "{{ .Major }}.{{ .Minor }}/stable"
         {{- end }}
-      - >-
         {{- if eq .Env.RELEASE_TYPE "latest" }}
           latest/stable
         {{- end }}
