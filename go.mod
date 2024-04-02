@@ -22,6 +22,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.25.5
 	github.com/aws/aws-sdk-go-v2/service/kms v1.26.5
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.46.0
+	github.com/aws/smithy-go v1.17.0
 	github.com/bgentry/speakeasy v0.1.0
 	github.com/bmatcuk/doublestar/v4 v4.6.0
 	github.com/chzyer/readline v1.5.1
@@ -81,7 +82,7 @@ require (
 	github.com/tombuildsstuff/giovanni v0.15.1
 	github.com/xanzy/ssh-agent v0.3.1
 	github.com/xlab/treeprint v0.0.0-20161029104018-1d6e34225557
-	github.com/zclconf/go-cty v1.14.1
+	github.com/zclconf/go-cty v1.14.4
 	github.com/zclconf/go-cty-debug v0.0.0-20191215020915-b22d67c1ba0b
 	github.com/zclconf/go-cty-yaml v1.0.3
 	go.opentelemetry.io/contrib/exporters/autoexport v0.0.0-20230703072336-9a582bd098a2
@@ -154,7 +155,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.17.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.20.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.25.6 // indirect
-	github.com/aws/smithy-go v1.17.0 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/bradleyfalzon/ghinstallation/v2 v2.1.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
