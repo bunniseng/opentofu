@@ -208,8 +208,19 @@ snapcrafts:
       providers as well as custom in-house solutions.
     base: core22
     channel_templates:
-      - '{{ if eq .Env.PRERELEASE_RELEASE "true" }}edge{{ else }}stable{{ end }}'
-    grade: '{{ if eq .Env.PRERELEASE_RELEASE "true" }}devel{{ else }}stable{{ end }}'
+      - >- 
+        {{- if eq .Env.RELEASE_TYPE "prerelease" }}
+          "{{ .Major }}.{{ .Minor }}/edge"
+        {{- end }}
+      - >-
+        {{- if eq .Env.RELEASE_TYPE "backport" }}
+          "{{ .Major }}.{{ .Minor }}/stable"
+        {{- end }}
+      - >-
+        {{- if eq .Env.RELEASE_TYPE "latest" }}
+          latest/stable
+        {{- end }}
+    grade: '{{ if eq .Env.RELEASE_TYPE "prerelease" }}devel{{ else }}stable{{ end }}'
     confinement: classic
     license: MPL-2.0
     apps:

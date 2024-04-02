@@ -34,3 +34,6 @@ dist/
 
 # Licensei cache file
 .licensei.cache
+
+# Temporary directory used for development
+tmp
