@@ -34,10 +34,10 @@ builds:
       #- solaris
 
     goarch:
-      - "386"
+      #- "386"
       - amd64
-      - arm
-      - arm64
+      #- arm
+      #- arm64
 
     ignore:
       - goos: freebsd
@@ -70,108 +70,108 @@ archives:
     id: zip 
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{- .Os }}_{{- .Arch }}"
 
-dockers:
-  - use: buildx
-    goarch: amd64
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.vendor=OpenTofu"
-      - "--label=org.opencontainers.image.description=OpenTofu {{ .Version }}"
-      - "--label=org.opencontainers.image.url=https://github.com/opentofu/opentofu"
-      - "--label=org.opencontainers.image.documentation=https://github.com/opentofu/opentofu/blob/main/README.md"
-      - "--label=org.opencontainers.image.source=https://github.com/opentofu/opentofu"
-      - "--label=org.opencontainers.image.licenses=MPL-2.0"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ time \"2006-01-02T15:04:05Z07:00\" }}"
-    image_templates:
-      - "ghcr.io/opentofu/opentofu:{{ .Version }}-amd64"
+#dockers:
+#  - use: buildx
+#    goarch: amd64
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/amd64"
+#      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+#      - "--label=org.opencontainers.image.vendor=OpenTofu"
+#      - "--label=org.opencontainers.image.description=OpenTofu {{ .Version }}"
+#      - "--label=org.opencontainers.image.url=https://github.com/opentofu/opentofu"
+#      - "--label=org.opencontainers.image.documentation=https://github.com/opentofu/opentofu/blob/main/README.md"
+#      - "--label=org.opencontainers.image.source=https://github.com/opentofu/opentofu"
+#      - "--label=org.opencontainers.image.licenses=MPL-2.0"
+#      - "--label=org.opencontainers.image.version={{ .Version }}"
+#      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+#      - "--label=org.opencontainers.image.created={{ time \"2006-01-02T15:04:05Z07:00\" }}"
+#    image_templates:
+#      - "ghcr.io/opentofu/opentofu:{{ .Version }}-amd64"
 
-  - use: buildx
-    goarch: arm64
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.vendor=OpenTofu"
-      - "--label=org.opencontainers.image.description=OpenTofu {{ .Version }}"
-      - "--label=org.opencontainers.image.url=https://github.com/opentofu/opentofu"
-      - "--label=org.opencontainers.image.documentation=https://github.com/opentofu/opentofu/blob/main/README.md"
-      - "--label=org.opencontainers.image.source=https://github.com/opentofu/opentofu"
-      - "--label=org.opencontainers.image.licenses=MPL-2.0"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ time \"2006-01-02T15:04:05Z07:00\" }}"
-    image_templates:
-      - "ghcr.io/opentofu/opentofu:{{ .Version }}-arm64"
+#  - use: buildx
+#    goarch: arm64
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/arm64"
+#      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+#      - "--label=org.opencontainers.image.vendor=OpenTofu"
+#      - "--label=org.opencontainers.image.description=OpenTofu {{ .Version }}"
+#      - "--label=org.opencontainers.image.url=https://github.com/opentofu/opentofu"
+#      - "--label=org.opencontainers.image.documentation=https://github.com/opentofu/opentofu/blob/main/README.md"
+#      - "--label=org.opencontainers.image.source=https://github.com/opentofu/opentofu"
+#      - "--label=org.opencontainers.image.licenses=MPL-2.0"
+#      - "--label=org.opencontainers.image.version={{ .Version }}"
+#      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+#      - "--label=org.opencontainers.image.created={{ time \"2006-01-02T15:04:05Z07:00\" }}"
+#    image_templates:
+#      - "ghcr.io/opentofu/opentofu:{{ .Version }}-arm64"
 
-  - use: buildx
-    goarch: arm
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.vendor=OpenTofu"
-      - "--label=org.opencontainers.image.description=OpenTofu {{ .Version }}"
-      - "--label=org.opencontainers.image.url=https://github.com/opentofu/opentofu"
-      - "--label=org.opencontainers.image.documentation=https://github.com/opentofu/opentofu/blob/main/README.md"
-      - "--label=org.opencontainers.image.source=https://github.com/opentofu/opentofu"
-      - "--label=org.opencontainers.image.licenses=MPL-2.0"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ time \"2006-01-02T15:04:05Z07:00\" }}"
-    image_templates:
-      - "ghcr.io/opentofu/opentofu:{{ .Version }}-arm"
+#  - use: buildx
+#    goarch: arm
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/arm"
+#      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+#      - "--label=org.opencontainers.image.vendor=OpenTofu"
+#      - "--label=org.opencontainers.image.description=OpenTofu {{ .Version }}"
+#      - "--label=org.opencontainers.image.url=https://github.com/opentofu/opentofu"
+#      - "--label=org.opencontainers.image.documentation=https://github.com/opentofu/opentofu/blob/main/README.md"
+#      - "--label=org.opencontainers.image.source=https://github.com/opentofu/opentofu"
+#      - "--label=org.opencontainers.image.licenses=MPL-2.0"
+#      - "--label=org.opencontainers.image.version={{ .Version }}"
+#      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+#      - "--label=org.opencontainers.image.created={{ time \"2006-01-02T15:04:05Z07:00\" }}"
+#    image_templates:
+#      - "ghcr.io/opentofu/opentofu:{{ .Version }}-arm"
 
-  - use: buildx
-    goarch: "386"
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/386"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.vendor=OpenTofu"
-      - "--label=org.opencontainers.image.description=OpenTofu {{ .Version }}"
-      - "--label=org.opencontainers.image.url=https://github.com/opentofu/opentofu"
-      - "--label=org.opencontainers.image.documentation=https://github.com/opentofu/opentofu/blob/main/README.md"
-      - "--label=org.opencontainers.image.source=https://github.com/opentofu/opentofu"
-      - "--label=org.opencontainers.image.licenses=MPL-2.0"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ time \"2006-01-02T15:04:05Z07:00\" }}"
-    image_templates:
-      - "ghcr.io/opentofu/opentofu:{{ .Version }}-386"
+#  - use: buildx
+#    goarch: "386"
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/386"
+#      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+#      - "--label=org.opencontainers.image.vendor=OpenTofu"
+#      - "--label=org.opencontainers.image.description=OpenTofu {{ .Version }}"
+#      - "--label=org.opencontainers.image.url=https://github.com/opentofu/opentofu"
+#      - "--label=org.opencontainers.image.documentation=https://github.com/opentofu/opentofu/blob/main/README.md"
+#      - "--label=org.opencontainers.image.source=https://github.com/opentofu/opentofu"
+#      - "--label=org.opencontainers.image.licenses=MPL-2.0"
+#      - "--label=org.opencontainers.image.version={{ .Version }}"
+#      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+#      - "--label=org.opencontainers.image.created={{ time \"2006-01-02T15:04:05Z07:00\" }}"
+#    image_templates:
+#      - "ghcr.io/opentofu/opentofu:{{ .Version }}-386"
 
-docker_manifests:
-  - name_template: ghcr.io/opentofu/opentofu:{{ .Version }}
-    image_templates:
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-amd64
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm64
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-386
+#docker_manifests:
+#  - name_template: ghcr.io/opentofu/opentofu:{{ .Version }}
+#    image_templates:
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-amd64
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm64
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-386
 
-  - name_template: ghcr.io/opentofu/opentofu:{{ .Major }}.{{ .Minor }}
-    image_templates:
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-amd64
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm64
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-386
+#  - name_template: ghcr.io/opentofu/opentofu:{{ .Major }}.{{ .Minor }}
+#    image_templates:
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-amd64
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm64
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-386
 
-  - name_template: ghcr.io/opentofu/opentofu:{{ .Major }}
-    image_templates:
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-amd64
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm64
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-386
+#  - name_template: ghcr.io/opentofu/opentofu:{{ .Major }}
+#    image_templates:
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-amd64
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm64
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-386
 
-  - name_template: ghcr.io/opentofu/opentofu:latest
-    image_templates:
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-amd64
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm64
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm
-      - ghcr.io/opentofu/opentofu:{{ .Version }}-386
-    skip_push: auto
+#  - name_template: ghcr.io/opentofu/opentofu:latest
+#    image_templates:
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-amd64
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm64
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-arm
+#      - ghcr.io/opentofu/opentofu:{{ .Version }}-386
+#    skip_push: auto
 
 nfpms:
   - file_name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}'
@@ -208,11 +208,13 @@ snapcrafts:
       providers as well as custom in-house solutions.
     base: core22
     channel_templates:
+      - '{{ .Major }}.{{ .Minor }}/{{ if eq .Env.RELEASE_FLAG_PRERELEASE "true" }}edge{{ else }}stable{{ end }}'
       - >-
-        {{- if eq .Env.RELEASE_TYPE "prerelease" }}"{{ .Major }}.{{ .Minor }}/edge"{{- end }}
-        {{- if eq .Env.RELEASE_TYPE "backport" }}"{{ .Major }}.{{ .Minor }}/stable"{{- end }}
-        {{- if eq .Env.RELEASE_TYPE "latest" }}latest/stable{{- end }}
-    grade: '{{ if eq .Env.RELEASE_TYPE "prerelease" }}devel{{ else }}stable{{ end }}'
+        {{- if eq .Env.RELEASE_FLAG_LATEST "true" }}
+          {{- if eq .Env.RELEASE_FLAG_PRERELEASE "true" }}latest/edge{{- end }}
+          {{- if eq .Env.RELEASE_FLAG_PRERELEASE "false" }}latest/stable{{- end }}
+        {{- end }}
+    grade: '{{ if eq .Env.RELEASE_FLAG_PRERELEASE "true" }}devel{{ else }}stable{{ end }}'
     confinement: classic
     license: MPL-2.0
     apps:

@@ -6,15 +6,14 @@ on:
       tag:
         description: "Git tag (leave empty for dry run)"
         required: false
-      release_type:
-        description: "Release type"
+      prerelease:
+        description: "Publish as prerelease?"
         required: true
-        type: choice
-        options:
-          - latest
-          - backport
-          - prerelease
-        default: "latest"
+        type: boolean
+      latest:
+        description: "Publish as latest?"
+        required: true
+        type: boolean
 
 jobs:
   release:
@@ -66,7 +65,7 @@ jobs:
       - name: Check if release is allowed or not
         id: validate_release
         run: |
-          if [[ "${{ inputs.release_type }}" != "prerelease" && "${{ steps.validate_tag.outputs.IS_TAG_ON_MAIN }}" == "true" ]]; then
+          if [[ "${{ inputs.prerelease }}" == "false" && "${{ steps.validate_tag.outputs.IS_TAG_ON_MAIN }}" == "true" ]]; then
             echo "ERROR: Creating stable release from a tag on main is not allowed."
             exit 1
           fi
@@ -76,7 +75,7 @@ jobs:
         run: |
           PUSH_ARCHIVE=$(
             [[ 
-              "${{ inputs.release_type }}" == "prerelease" && 
+              "${{ inputs.prerelease }}" == "true" && 
               ("${{ steps.validate_tag.outputs.IS_TAG_ON_MAIN }}" == "true" || 
               "${{ steps.validate_tag.outputs.IS_TAG_ON_VERSION }}" == "true") 
             ]] && echo false || echo true
@@ -134,7 +133,8 @@ jobs:
           # goreleaser won't sign the packages.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_TOKEN }}
-          RELEASE_TYPE: ${{ inputs.release_type }}
+          RELEASE_FLAG_PRERELEASE: ${{ inputs.prerelease }}
+          RELEASE_FLAG_LATEST: ${{ inputs.latest }}
 
       - name: Remove GPG key
         if: always()
