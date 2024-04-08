@@ -209,7 +209,11 @@ snapcrafts:
     base: core22
     grade: '{{ if eq .Env.RELEASE_FLAG_PRERELEASE "true" }}devel{{ else }}stable{{ end }}'
     channel_templates:
-      - '{{ if eq .Env.RELEASE_FLAG_PRERELEASE "true" }}latest/edge{{ else }}latest/stable{{ end }}'
+      - >-
+        {{- if eq .Env.RELEASE_FLAG_LATEST "true" }}
+          {{- if eq .Env.RELEASE_FLAG_PRERELEASE "true" }}latest/edge{{- end }}
+          {{- if eq .Env.RELEASE_FLAG_PRERELEASE "false" }}latest/stable{{- end }}
+        {{- end }}
     confinement: classic
     license: MPL-2.0
     apps:
