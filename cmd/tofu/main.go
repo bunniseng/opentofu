@@ -9,7 +9,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/opentofu/opentofu/internal/tfdiags"
 	"log"
 	"net"
 	"os"
@@ -30,6 +29,7 @@ import (
 	"github.com/opentofu/opentofu/internal/httpclient"
 	"github.com/opentofu/opentofu/internal/logging"
 	"github.com/opentofu/opentofu/internal/terminal"
+	"github.com/opentofu/opentofu/internal/tfdiags"
 	"github.com/opentofu/opentofu/version"
 	"go.opentelemetry.io/otel/trace"
 
