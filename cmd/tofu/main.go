@@ -41,25 +41,31 @@ const (
 
 	// The parent process will create a file to collect crash logs
 	envTmpLogPath = "TF_TEMP_LOG_PATH"
+
+	// Global options
+	optionChDir    = "chdir"
+	optionHelp     = "help"
+	optionPedantic = "pedantic"
+	optionVersion  = "version"
 )
 
-// ui wraps the primary output cli.Ui, and redirects Warn calls to Output
-// calls. This ensures that warnings are sent to stdout, and are properly
-// serialized within the stdout stream.
+// ui wraps the primary output cli.Ui
+// When in pedantic mode, warning messages are redirected to Error
+// When not in pedantic mode, warning messages are redirected to Output, this ensures that warnings
+// are sent to stdout, and are properly serialized within the stdout stream.
 type ui struct {
 	cli.Ui
+	pedanticMode   bool
+	warningFlagged bool
 }
 
 func (u *ui) Warn(msg string) {
+	if u.pedanticMode {
+		u.warningFlagged = true
+		u.Ui.Error(msg)
+		return
+	}
 	u.Ui.Output(msg)
-}
-
-func init() {
-	Ui = &ui{&cli.BasicUi{
-		Writer:      os.Stdout,
-		ErrorWriter: os.Stderr,
-		Reader:      os.Stdin,
-	}}
 }
 
 func main() {
@@ -71,13 +77,49 @@ func realMain() int {
 
 	var err error
 
+	cliUi := &ui{
+		Ui: &cli.BasicUi{
+			Writer:      os.Stdout,
+			ErrorWriter: os.Stderr,
+			Reader:      os.Stdin,
+		},
+	}
+
+	binName := filepath.Base(os.Args[0])
+	args := os.Args[1:]
+	opts, err := getGlobalOptions(args)
+	if err != nil {
+		cliUi.Error(err.Error())
+		return 1
+	}
+	args = args[len(opts):]
+
+	// Set to the version subcommand if version has been toggled
+	if _, ok := opts[optionVersion]; ok {
+		newArgs := make([]string, len(args)+1)
+		newArgs = append(newArgs, "version")
+		copy(newArgs[1:], args)
+		args = newArgs
+	}
+
+	// Attach the help option to the command or subcommand arguments to activate help if it has been toggled
+	if _, ok := opts[optionHelp]; ok {
+		args = append(args, fmt.Sprintf("-%s", optionHelp))
+	}
+
+	// Set up in pedantic mode if pedantic has been toggled
+	var pedanticMode bool
+	if _, ok := opts[optionPedantic]; ok {
+		pedanticMode, cliUi.pedanticMode = true, true
+	}
+
 	err = openTelemetryInit()
 	if err != nil {
 		// openTelemetryInit can only fail if OpenTofu was run with an
 		// explicit environment variable to enable telemetry collection,
 		// so in typical use we cannot get here.
-		Ui.Error(fmt.Sprintf("Could not initialize telemetry: %s", err))
-		Ui.Error(fmt.Sprintf("Unset environment variable %s if you don't intend to collect telemetry from OpenTofu.", openTelemetryExporterEnvVar))
+		cliUi.Ui.Error(fmt.Sprintf("Could not initialize telemetry: %s", err))
+		cliUi.Ui.Error(fmt.Sprintf("Unset environment variable %s if you don't intend to collect telemetry from OpenTofu.", openTelemetryExporterEnvVar))
 		return 1
 	}
 	var ctx context.Context
@@ -116,7 +158,7 @@ func realMain() int {
 
 	streams, err := terminal.Init()
 	if err != nil {
-		Ui.Error(fmt.Sprintf("Failed to configure the terminal: %s", err))
+		cliUi.Ui.Error(fmt.Sprintf("Failed to configure the terminal: %s", err))
 		return 1
 	}
 	if streams.Stdout.IsTerminal() {
@@ -146,7 +188,7 @@ func realMain() int {
 		// Since we haven't instantiated a command.Meta yet, we need to do
 		// some things manually here and use some "safe" defaults for things
 		// that command.Meta could otherwise figure out in smarter ways.
-		Ui.Error("There are some problems with the CLI configuration:")
+		cliUi.Ui.Error("There are some problems with the CLI configuration:")
 		for _, diag := range diags {
 			earlyColor := &colorstring.Colorize{
 				Colors:  colorstring.DefaultColors,
@@ -156,10 +198,10 @@ func realMain() int {
 			// We don't currently have access to the source code cache for
 			// the parser used to load the CLI config, so we can't show
 			// source code snippets in early diagnostics.
-			Ui.Error(format.Diagnostic(diag, nil, earlyColor, 78))
+			cliUi.Ui.Error(format.Diagnostic(diag, nil, earlyColor, 78))
 		}
 		if diags.HasErrors() {
-			Ui.Error("As a result of the above problems, OpenTofu may not behave as intended.\n\n")
+			cliUi.Ui.Error("As a result of the above problems, OpenTofu may not behave as intended.\n\n")
 			// We continue to run anyway, since OpenTofu has reasonable defaults.
 		}
 	}
@@ -187,17 +229,17 @@ func realMain() int {
 
 	providerSrc, diags := providerSource(config.ProviderInstallation, services)
 	if len(diags) > 0 {
-		Ui.Error("There are some problems with the provider_installation configuration:")
+		cliUi.Ui.Error("There are some problems with the provider_installation configuration:")
 		for _, diag := range diags {
 			earlyColor := &colorstring.Colorize{
 				Colors:  colorstring.DefaultColors,
 				Disable: true, // Disable color to be conservative until we know better
 				Reset:   true,
 			}
-			Ui.Error(format.Diagnostic(diag, nil, earlyColor, 78))
+			cliUi.Ui.Error(format.Diagnostic(diag, nil, earlyColor, 78))
 		}
 		if diags.HasErrors() {
-			Ui.Error("As a result of the above problems, OpenTofu's provider installer may not behave as intended.\n\n")
+			cliUi.Ui.Error("As a result of the above problems, OpenTofu's provider installer may not behave as intended.\n\n")
 			// We continue to run anyway, because most commands don't do provider installation.
 		}
 	}
@@ -208,36 +250,24 @@ func realMain() int {
 	// primarily by the SDK's acceptance testing framework.
 	unmanagedProviders, err := parseReattachProviders(os.Getenv("TF_REATTACH_PROVIDERS"))
 	if err != nil {
-		Ui.Error(err.Error())
+		cliUi.Ui.Error(err.Error())
 		return 1
 	}
 
 	// Initialize the backends.
 	backendInit.Init(services)
 
-	// Get the command line args.
-	binName := filepath.Base(os.Args[0])
-	args := os.Args[1:]
-
 	originalWd, err := os.Getwd()
 	if err != nil {
 		// It would be very strange to end up here
-		Ui.Error(fmt.Sprintf("Failed to determine current working directory: %s", err))
+		cliUi.Ui.Error(fmt.Sprintf("Failed to determine current working directory: %s", err))
 		return 1
 	}
 
-	// The arguments can begin with a -chdir option to ask OpenTofu to switch
-	// to a different working directory for the rest of its work. If that
-	// option is present then extractChdirOption returns a trimmed args with that option removed.
-	overrideWd, args, err := extractChdirOption(args)
-	if err != nil {
-		Ui.Error(fmt.Sprintf("Invalid -chdir option: %s", err))
-		return 1
-	}
-	if overrideWd != "" {
+	if overrideWd, ok := opts[optionChDir]; ok {
 		err := os.Chdir(overrideWd)
 		if err != nil {
-			Ui.Error(fmt.Sprintf("Error handling -chdir option: %s", err))
+			cliUi.Ui.Error(fmt.Sprintf("Error handling -chdir option: %s", err))
 			return 1
 		}
 	}
@@ -248,7 +278,8 @@ func realMain() int {
 		// in case they need to refer back to it for any special reason, though
 		// they should primarily be working with the override working directory
 		// that we've now switched to above.
-		initCommands(ctx, originalWd, streams, config, services, providerSrc, providerDevOverrides, unmanagedProviders)
+		initCommands(ctx, originalWd, streams, config,
+			services, providerSrc, providerDevOverrides, unmanagedProviders, cliUi, pedanticMode)
 	}
 
 	// Attempt to ensure the config directory exists.
@@ -273,7 +304,7 @@ func realMain() int {
 	// Prefix the args with any args from the EnvCLI
 	args, err = mergeEnvArgs(EnvCLI, cliRunner.Subcommand(), args)
 	if err != nil {
-		Ui.Error(err.Error())
+		cliUi.Ui.Error(err.Error())
 		return 1
 	}
 
@@ -283,19 +314,8 @@ func realMain() int {
 	args, err = mergeEnvArgs(
 		fmt.Sprintf("%s_%s", EnvCLI, suffix), cliRunner.Subcommand(), args)
 	if err != nil {
-		Ui.Error(err.Error())
+		cliUi.Ui.Error(err.Error())
 		return 1
-	}
-
-	// We shortcut "--version" and "-v" to just show the version
-	for _, arg := range args {
-		if arg == "-v" || arg == "-version" || arg == "--version" {
-			newArgs := make([]string, len(args)+1)
-			newArgs[0] = "version"
-			copy(newArgs[1:], args)
-			args = newArgs
-			break
-		}
 	}
 
 	// Rebuild the CLI with any modified args.
@@ -346,7 +366,7 @@ func realMain() int {
 
 	exitCode, err := cliRunner.Run()
 	if err != nil {
-		Ui.Error(fmt.Sprintf("Error executing CLI: %s", err.Error()))
+		cliUi.Ui.Error(fmt.Sprintf("Error executing CLI: %s", err.Error()))
 		return 1
 	}
 
@@ -354,8 +374,13 @@ func realMain() int {
 	// plugins crashing
 	if exitCode != 0 {
 		for _, panicLog := range logging.PluginPanics() {
-			Ui.Error(panicLog)
+			cliUi.Ui.Error(panicLog)
 		}
+	}
+
+	// Exit with a non-zero exit code if no previous error has been found and a pedantic warning has been flagged
+	if exitCode == 0 && cliUi.pedanticMode && cliUi.warningFlagged {
+		exitCode = 1
 	}
 
 	return exitCode
@@ -520,4 +545,35 @@ func mkConfigDir(configDir string) error {
 	}
 
 	return err
+}
+
+func getGlobalOptions(args []string) (map[string]string, error) {
+	options := make(map[string]string)
+	for _, arg := range args {
+		if !strings.HasPrefix(arg, "-") {
+			// Global options are processed before the subcommand
+			// Exit if we have found the subcommand
+			break
+		}
+
+		option := strings.SplitN(arg[1:], "=", 2)
+		if option[0] == optionChDir {
+			if len(option) != 2 {
+				return nil, fmt.Errorf(
+					"invalid global option -%s: must include an equals sign followed by a value: -%s=value",
+					option[0],
+					option[0])
+			}
+		} else if option[0] == "v" || option[0] == "-version" {
+			// Capture -v and --version as version option
+			option[0] = optionVersion
+		}
+
+		if len(option) != 2 {
+			option = append(option, "")
+		}
+		options[option[0]] = option[1]
+	}
+
+	return options, nil
 }
