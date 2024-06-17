@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/opentofu/opentofu/internal/tfdiags"
 	"log"
 	"net"
 	"os"
@@ -110,7 +111,7 @@ func realMain() int {
 	// Set up in pedantic mode if pedantic has been toggled
 	var pedanticMode bool
 	if _, ok := opts[optionPedantic]; ok {
-		pedanticMode, cliUi.pedanticMode = true, true
+		pedanticMode, cliUi.pedanticMode, tfdiags.PedanticMode = true, true, true
 	}
 
 	err = openTelemetryInit()

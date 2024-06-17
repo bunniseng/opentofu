@@ -101,11 +101,15 @@ func (diags Diagnostics) Append(new ...interface{}) Diagnostics {
 	return diags
 }
 
-// HasErrors returns true if any of the diagnostics in the list have
-// a severity of Error.
+
+var PedanticMode bool
+
+// HasErrors checks to see if any of the diagnostics in the list have errors
+// When in pedantic mode, warnings are treated as errors
 func (diags Diagnostics) HasErrors() bool {
 	for _, diag := range diags {
-		if diag.Severity() == Error {
+		severity := diag.Severity()
+		if severity == Error || PedanticMode && severity == Warning {
 			return true
 		}
 	}
