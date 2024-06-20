@@ -378,7 +378,11 @@ func TestGetGlobalOptions(t *testing.T) {
 	}{
 		{"positive tc chdir", []string{"-chdir=target", "plan", "-state=file.tfstate"}, map[string]string{"chdir": "target"}},
 		{"positive tc 1 version", []string{"-version", "plan", "-state=file.tfstate"}, map[string]string{"version": ""}},
-		{"positive tc 2 version", []string{"--version", "plan", "-state=file.tfstate"}, map[string]string{"version": ""}},
+		{"positive tc 2 version", []string{"-v", "plan", "-state=file.tfstate"}, map[string]string{"version": ""}},
+		{"positive tc 3 version", []string{"--version", "plan", "-state=file.tfstate"}, map[string]string{"version": ""}},
+		{"positive tc 4 version", []string{"plan", "-state=file.tfstate", "-version"}, map[string]string{"version": ""}},
+		{"positive tc 5 version", []string{"plan", "-state=file.tfstate", "-v"}, map[string]string{"version": ""}},
+		{"positive tc 6 version", []string{"plan", "-state=file.tfstate", "--version"}, map[string]string{"version": ""}},
 		{"positive tc random", []string{"-random", "plan", "-state=file.tfstate"}, map[string]string{"random": ""}},
 		{"positive tc multi", []string{"-help", "-version", "plan", "-state=file.tfstate"}, map[string]string{"help": "", "version": ""}},
 		{"positive tc omitted", []string{"plan", "-state=file.tfstate"}, map[string]string{}},

@@ -504,24 +504,33 @@ func mkConfigDir(configDir string) error {
 
 func getGlobalOptions(args []string) (map[string]string, error) {
 	options := make(map[string]string)
+	subcommandFound := false
 	for _, arg := range args {
-		if !strings.HasPrefix(arg, "-") {
+		if !strings.HasPrefix(arg, "-") && !subcommandFound {
 			// Global options are processed before the subcommand
 			// Exit if we have found the subcommand
-			break
+			subcommandFound = true
 		}
 
 		option := strings.SplitN(arg[1:], "=", 2)
-		if option[0] == optionChDir {
-			if len(option) != 2 {
-				return nil, fmt.Errorf(
-					"invalid global option -%s: must include an equals sign followed by a value: -%s=value",
-					option[0],
-					option[0])
-			}
-		} else if option[0] == "v" || option[0] == "-version" {
-			// Capture -v and --version as version option
+
+		// Retain backwards compatibility as version option historically can be anywhere on the arg list
+		if option[0] == optionVersion || option[0] == "v" || option[0] == "-version" {
+			// Capture -version, -v and --version as the version option
 			option[0] = optionVersion
+		} else {
+			if subcommandFound {
+				continue
+			}
+
+			if option[0] == optionChDir {
+				if len(option) != 2 {
+					return nil, fmt.Errorf(
+						"invalid global option -%s: must include an equals sign followed by a value: -%s=value",
+						option[0],
+						option[0])
+				}
+			}
 		}
 
 		if len(option) != 2 {
