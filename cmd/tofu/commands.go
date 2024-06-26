@@ -111,6 +111,8 @@ func initCommands(
 		UnmanagedProviders:   unmanagedProviders,
 
 		AllowExperimentalFeatures: experimentsAreAllowed(),
+
+		PedanticMode: pedanticMode,
 	}
 
 	// The command list is included in the tofu -help
